@@ -1,69 +1,60 @@
+﻿using InventoryTracker.Models;
 using InventoryTracker.Services;
-using System;
 
-namespace InventoryTracker
+InventoryService service = new();
+
+Console.WriteLine("\n >> Welcome to MY INVENTORY <<");
+while (true)
 {
-    class Program
+    Console.WriteLine("\n\n |> MENU <| \n");
+    Console.WriteLine("1. Add Item");
+    Console.WriteLine("2. View Inventory");
+    Console.WriteLine("3. Update Item");
+    Console.WriteLine("4. Delete Item");
+    Console.WriteLine("5. Exit");
+    Console.Write("\n> Please choose an option to continue: ");
+    string? input = Console.ReadLine();
+
+    switch (input)
     {
-        static void Main(string[] args)
-        {
-            InventoryService service = new();
+        case "1":
+            Console.WriteLine("\n > Add Item <\n");
+            Console.Write("Item name: ");
+            string? name = Console.ReadLine();
+            Console.Write("Quantity: ");
+            if (int.TryParse(Console.ReadLine(), out int qty))
+                service.AddItem(new Item { Name = name, Quantity = qty });
+            else
+                Console.WriteLine("Invalid quantity.");
+            break;
 
-            while (true)
-            {
+        case "2":
+            var items = service.GetAllItems();
+            Console.WriteLine("\n--- Inventory List ---");
+            foreach (var item in items)
+                Console.WriteLine($"{item.Id}. {item.Name} - Qty: {item.Quantity}");
+            break;
 
-                Console.WriteLine(">>>| Inventory Tracker |<<<");
-                Console.WriteLine("1. Add Item");
-                Console.WriteLine("2. View Inventory");
-                Console.WriteLine("3. Update Item");
-                Console.WriteLine("4. Delete Item");
-                Console.WriteLine("5. Exit");
-                Console.Write("Select an option: ");
-                string choice = Console.ReadLine();
+        case "3":
+            Console.Write("Enter Item ID to update: ");
+            int.TryParse(Console.ReadLine(), out int updateId);
+            Console.Write("New quantity: ");
+            int.TryParse(Console.ReadLine(), out int newQty);
+            service.UpdateItem(updateId, newQty);
+            break;
 
-                switch (choice)
-                {
-                    case "1":
-                        Console.Write("Enter item name: ");
-                        string name = Console.ReadLine();
+        case "4":
+            Console.Write("Enter Item ID to delete: ");
+            int.TryParse(Console.ReadLine(), out int deleteId);
+            service.DeleteItem(deleteId);
+            break;
 
-                        Console.Write("Enter quantity: ");
-                        if (int.TryParse(Console.ReadLine(), out int qty))
-                            service.AddItem(name, qty);
-                        else
-                            Console.WriteLine(" !! Invalid quantity. !!");
-                        break;
+        case "5":
+            Console.WriteLine("Goodbye!");
+            return;
 
-                    case "2":
-                        service.ViewInventory();
-                        break;
-
-                    case "3":
-                        Console.Write("Enter item name to update: ");
-                        string updateName = Console.ReadLine();
-
-                        Console.Write("Enter new quantity: ");
-                        if (int.TryParse(Console.ReadLine(), out int newQty))
-                            service.UpdateItem(updateName, newQty);
-                        else
-                            Console.WriteLine(" !! Invalid quantity. !!");
-                        break;
-
-                    case "4":
-                        Console.Write("Enter item name to delete: ");
-                        string deleteName = Console.ReadLine();
-                        service.DeleteItem(deleteName);
-                        break;
-
-                    case "5":
-                        Console.WriteLine("Goodbye!");
-                        return;
-
-                    default:
-                        Console.WriteLine(" !! Invalid choice. !! \n");
-                        break;
-                }
-            }
-        }
+        default:
+            Console.WriteLine("Invalid option.");
+            break;
     }
 }
