@@ -1,62 +1,53 @@
-﻿using InventoryTracker.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using InventoryTracker.Models;
 
 namespace InventoryTracker.Services
 {
     public class InventoryService
     {
-        private readonly List<Item> _inventory = new();
+        private readonly DatabaseService _db = new();
 
-        public void AddItem(string name, int quantity)
+        public void AddItem(Item item)
         {
-            _inventory.Add(new Item { Name = name, Quantity = quantity });
-            Console.WriteLine(" >> Item added successfully. <<\n");
+            string query = "INSERT INTO Inventory (Name, Quantity) VALUES (@name, @qty)";
+            if (item.Name != null)
+            { 
+                var parameters = new Dictionary<string, object>
+                {
+                    { "@name", item.Name },
+                    { "@qty", item.Quantity }
+                };
+                 _db.ExecuteNonQuery(query, parameters);
+            }
+           
         }
 
-        public void ViewInventory()
+        public List<Item> GetAllItems()
         {
-            if (_inventory.Count == 0)
-            {
-                Console.WriteLine(" >> !! Inventory is empty. !! <<\n");
-                return;
-            }
-
-            Console.WriteLine("\n >> Current Inventory <<");
-            foreach (var item in _inventory)
-            {
-                Console.WriteLine($"- {item.Name}: {item.Quantity}");
-            }
-            Console.WriteLine();
+            return _db.ExecuteReader("SELECT * FROM Inventory");
         }
 
-        public void UpdateItem(string name, int newQuantity)
+        public void UpdateItem(int id, int newQuantity)
         {
-            var item = _inventory.Find(i => i.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-            if (item != null)
+            string query = "UPDATE Inventory SET Quantity = @qty WHERE Id = @id";
+            var parameters = new Dictionary<string, object>
             {
-                item.Quantity = newQuantity;
-                Console.WriteLine("✅ Item updated successfully.\n");
-            }
-            else
-            {
-                Console.WriteLine("❌ Item not found.\n");
-            }
+                { "@qty", newQuantity },
+                { "@id", id }
+            };
+            _db.ExecuteNonQuery(query, parameters);
         }
 
-        public void DeleteItem(string name)
+        public void DeleteItem(int id)
         {
-            var item = _inventory.Find(i => i.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-            if (item != null)
+            string query = "DELETE FROM Inventory WHERE Id = @id";
+            var parameters = new Dictionary<string, object>
             {
-                _inventory.Remove(item);
-                Console.WriteLine("✅ Item deleted successfully.\n");
-            }
-            else
-            {
-                Console.WriteLine("❌ Item not found.\n");
-            }
+                { "@id", id }
+            };
+            _db.ExecuteNonQuery(query, parameters);
         }
-
     }
 }
