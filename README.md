@@ -35,5 +35,3 @@ A lightweight console-based Inventory Management System built using **C# and .NE
 - SQL Server Management Studio (SSMS)
 - Power BI Desktop
 - Microsoft 365 account (for Power Automate)
-git clone https://github.com/yourusername/InventoryTracker.git
-cd InventoryTracker
